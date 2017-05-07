@@ -33,6 +33,8 @@ class Abbv(object):
 		self.rain = False
 		self.dropstep = 50
 
+	def get_shape(self):
+		return (self.nx,self.ny)
 	def get_h(self):
 		return self.h[self.nb:-self.nb,self.nb:-self.nb]
 	def set_rain(self,rain, drop=50):

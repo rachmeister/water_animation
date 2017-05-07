@@ -3,18 +3,19 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import axes3d
 
+import setup
 from abbv import Abbv
 
-n = 64 
+sim = setup.raining(64)
 
-dx = 0.5
-nx=n
-ny=n
-X=np.arange(-(nx-1)*dx/2.,(nx)*dx/2.,dx)
-Y=np.arange(-(ny-1)*dx/2.,(ny)*dx/2.,dx)
+# Setup for display
+nx,ny=sim.get_shape()
+X=np.arange(-(nx-1)/2.,(nx)/2.,1.)
+Y=np.arange(-(ny-1)/2.,(ny)/2.,1.)
 X,Y=np.meshgrid(X,Y)
 
-zlim = 0.1
+zlim = 0.15 
+
 fig = plt.figure(figsize=(7, 7)) 
 ax = fig.gca(projection='3d')
 #fig.canvas.mpl_connect('button_press_event', onClick)

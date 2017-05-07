@@ -1,21 +1,28 @@
 import numpy as np
+from abbv import Abbv
 
-def single_drop(): 
-	h0 = np.zeros((n,n),dtype=np.double)
+def single_drop(n=64): 
+	
 	h0 = np.zeros((n,n),dtype=np.double)
 	a0 = np.ones((n,n+1),dtype=np.double)
 	b0 = np.ones((n+1,n),dtype=np.double)
-	a0[:,0:35] = 0.
-	h0[12:15,12:15] = 0.15
+	idx = int(n/2)
+	h0[idx-1:idx+1,idx-1:idx+1] = 0.15
 
 	sim = Abbv(h0,a0,b0)
-	sim.rain = False
+	sim.set_rain(False)
+	
+	return sim
+
+def raining(n=64):
+
+	h0 = np.zeros((n,n),dtype=np.double)
 	a0 = np.ones((n,n+1),dtype=np.double)
 	b0 = np.ones((n+1,n),dtype=np.double)
-	a0[:,0:35] = 0.
-	h0[12:15,12:15] = 0.15
 
 	sim = Abbv(h0,a0,b0)
-	sim.rain = False
+	sim.set_rain(True)
+	
+	return sim
 
 
