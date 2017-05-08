@@ -2,6 +2,7 @@ import numpy as np
 import random
 
 from abbv import Abbv
+import methods
 
 
 def still(n=64):
@@ -54,8 +55,10 @@ def coastline(n=64):
 	a0 = np.ones((n,n+1),dtype=np.double)
 	b0 = np.ones((n+1,n),dtype=np.double)
 
-	for i in range(0,n):
-		a0[i,0] = random.random()
+	idx = int(n/4)
+	h0[idx-1:idx+1,idx-1:idx+1] = 0.15
+#	for i in range(0,n):
+#		a0[i,0] = random.random()
 
 	sim = Abbv(h0,methods.linear5_irregular,a0,b0)
 

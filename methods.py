@@ -21,12 +21,13 @@ def linear5_irregular(sim):
 	c2 = sim.g
 	dt = sim.dt
 	dx = sim.dx
+	nb = sim.nb
 
-	A = 2./(np.square(sim.alpha[0:sim.nx-2])+np.multiply(sim.alpha[0:sim.nx-2],sim.alpha[1:sim.nx-1]) )
-	B = 2./(np.square(sim.beta[sim.nx-2:0])+np.multiply(sim.beta[sim.nx-2:0],sim.beta[sim.nx-1:1]) )
-	C = -2./np.multiply(sim.alpha[0:sim.nx-2],sim.alpha[1:sim.nx-1])-2./np.multiply(sim.beta[sim.nx-2:0],sim.beta[sim.nx-1:1])
-	D = 2./(np.square(sim.beta[sim.nx-1:1])+np.multiply(sim.beta[sim.nx-2:0],sim.beta[sim.nx-1:1]) )
-	E = 2./(np.square(sim.alpha[1:sim.nx-1])+np.multiply(sim.alpha[0:sim.nx-2],sim.alpha[1:sim.nx-1]) )
+	A = 2./(np.square(sim.alpha[:,:-1])+np.multiply(sim.alpha[:,:-1],sim.alpha[:,1:]) )
+	B = 2./(np.square(sim.beta[1:,:])+np.multiply(sim.beta[1:,:],sim.beta[:-1,:]) )
+	C = -2./np.multiply(sim.alpha[:,:-1],sim.alpha[:,1:])-2./np.multiply(sim.beta[:-1,:],sim.beta[1:,:])
+	D = 2./(np.square(sim.beta[:-1,:])+np.multiply(sim.beta[:-1,:],sim.beta[1:,:]) )
+	E = 2./(np.square(sim.alpha[:,1:])+np.multiply(sim.alpha[:,:1],sim.alpha[:,:-1]) )
 
 	dh = (1.-k*dt)*(sim.dh)+(c2*(dt/dx)**2)*(-np.multiply(C,sim.h[  nb:  -nb,  nb:  -nb]) + \
 															np.multiply(A,sim.h[    :-2*nb,  nb:  -nb]) + \

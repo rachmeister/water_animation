@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+#import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import axes3d
@@ -7,14 +8,16 @@ from mpl_toolkits.mplot3d import axes3d
 import setup
 from abbv import Abbv
 
+#matplotlib.use('GTKAgg') 
+
 if(len(sys.argv) > 1):
 	example = sys.argv[1]
 	if example == 'rain':
 		sim = setup.raining(86)
 	elif example == 'drop':
-		sim = setup.single_drop(64)
+		sim = setup.single_drop(86)
 	elif example == 'wake':
-		sim = setup.wake(64)
+		sim = setup.wake(86)
 	elif example == 'coast':
 		sim = setup.coastline(64)
 else:
@@ -23,7 +26,6 @@ else:
 sim.set_bc('reflective')
 #sim.set_bc('passive')
 #sim.set_bc('periodic')
-#sim.add_object()
 
 # Setup for display
 nx,ny=sim.get_shape()
@@ -40,7 +42,7 @@ ax = fig.gca(projection='3d')
 
 for it in range(0,10000):
 	sim.step()
-	if(it%15 == 0):
+	if(it%20 == 0):
 		ax.clear()
 		ax.plot_wireframe(X,Y,sim.get_h())
 		ax.set_zlim3d(-zlim,zlim)

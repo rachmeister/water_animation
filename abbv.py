@@ -126,16 +126,5 @@ class Abbv(object):
 			self.move_object()
 		self.bc(self)
 		self.dh = self.steptype(self)
-#		self.dh = methods.linear5_irregular(self)
 		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
 		self.it = self.it+1
-
-#	def step9(self):
-#		if(self.rain and self.it%self.dropstep==0):
-#			self.add_drop(0)
-#		if(self.obj and self.it%self.objstep==0):
-#			self.move_object()
-#		self.bc(self)
-#		self.dh = methods.linear9(self)
-#		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
-#		self.it = self.it+1
