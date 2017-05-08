@@ -12,32 +12,39 @@ class Abbv(object):
 		u0,v0 are initial velocities [m/2]
 	"""
 
-	def __init__(self, h0, a0, b0):
+	def __init__(self, h0, steptype=methods.linear9, a0=[], b0=[]):
 		self.nx,self.ny = h0.shape		# number of points in x,y of the domain
-		self.nb = 1 						# number of boundary cells per side
 		self.it = 0							# iteration number
 
+		self.nb = 1 						# number of boundary cells per side
+		self.bc = methods.passive_bc 	# Boundary Condition type -- callable BC function 
+
+		self.steptype = steptype
+
+		# State arrays
 		array = np.zeros((self.nx+2*self.nb,self.ny+2*self.nb),dtype=np.double)
 		array[self.nb:-self.nb,self.nb:-self.nb] = h0
 		self.h = array
 		self.dh = np.zeros((self.nx,self.ny),dtype=np.double)
 
-		self.bc = methods.passive_bc 	# Boundary Condition type -- callable BC function 
-
+		# Model Constants
 		self.g = 0.8
-		self.b = 0.05 
-
+		self.b = 0.2 
 		self.dt = 0.01
 		self.dx = 0.5
+
+		# Fractions for irregular boundaries
 		self.alpha = a0
 		self.beta = b0
 
+		# Rain state
 		self.rain = False
 		self.dropstep = 50
 
-		self.obj = True
-		self.objx = 10.
-		self.objy = 10.
+		# Wake object state
+		self.obj = False 
+		self.posx = 10.
+		self.posy = 10.
 		self.sgn = 1.
 		self.objstep = 25
 
@@ -46,9 +53,12 @@ class Abbv(object):
 		return (self.nx,self.ny)
 	def get_h(self):
 		return self.h[self.nb:-self.nb,self.nb:-self.nb]
-	def set_rain(self,rain, drop=50):
+	def set_rain(self,rain,step=50):
 		self.rain = rain
-		self.dropstep = drop
+		self.dropstep = step
+	def set_obj(self,obj,step=25):
+		self.obj = obj
+		self.objstep = step
 	def set_bc(self,type):
 		if type == 'passive':
 			self.bc = methods.passive_bc
@@ -64,19 +74,18 @@ class Abbv(object):
 		direction = random.random()
 		dx = self.sgn*direction*move
 		dy = self.sgn*(1.-direction)*move
-		if( self.objx + dx > self.nx or self.objx + dx < 0 ):
+		if( self.posx + dx > self.nx or self.posx + dx < 0 ):
 			dx = -dx
 			self.sgn = -self.sgn
-		if( self.objy + dy > self.ny or self.objy + dy < 0 ):
+		if( self.posy + dy > self.ny or self.posy + dy < 0 ):
 			dy = -dy
 			self.sgn = -self.sgn
-		self.objx = self.objx + dx
-		self.objy = self.objy + dy		
+		self.posx = self.posx + dx
+		self.posy = self.posy + dy		
 
-		idx = int(self.objx)
-		idy = int(self.objy)
-		self.h[idx,idy] = self.h[idx,idy] - 0.005*(1.-self.objx+idx)
-		self.h[idx,idy] = self.h[idx,idy] - 0.005*(1.-self.objy+idy)
+		idx = int(self.posx)
+		idy = int(self.posy)
+		self.h[idx,idy] = self.h[idx,idy] - 0.005*(1.-self.posx+idx+1.-self.posy+idy)
 
 
 	def add_drop(self,height):
@@ -109,24 +118,24 @@ class Abbv(object):
 			h = np.roll(h,width,0)
 		self.h = h
 
-####Steps in time
-	def step5(self):
+####Perform step in time
+	def step(self):
 		if(self.rain and self.it%self.dropstep==0):
 			self.add_drop(0)
 		if(self.obj and self.it%self.objstep==0):
 			self.move_object()
 		self.bc(self)
-		self.dh = methods.linear5(self)
+		self.dh = self.steptype(self)
 #		self.dh = methods.linear5_irregular(self)
 		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
 		self.it = self.it+1
 
-	def step9(self):
-		if(self.rain and self.it%self.dropstep==0):
-			self.add_drop(0)
-		if(self.obj and self.it%self.objstep==0):
-			self.move_object()
-		self.bc(self)
-		self.dh = methods.linear9(self)
-		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
-		self.it = self.it+1
+#	def step9(self):
+#		if(self.rain and self.it%self.dropstep==0):
+#			self.add_drop(0)
+#		if(self.obj and self.it%self.objstep==0):
+#			self.move_object()
+#		self.bc(self)
+#		self.dh = methods.linear9(self)
+#		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
+#		self.it = self.it+1
