@@ -56,9 +56,10 @@ def coastline(n=64):
 	b0 = np.ones((n+1,n),dtype=np.double)
 
 	idx = int(n/4)
-	h0[idx-1:idx+1,idx-1:idx+1] = 0.15
-#	for i in range(0,n):
-#		a0[i,0] = random.random()
+	h0[idx-1:idx+1,idx-1:idx+1] = 0.05
+	for i in range(0,n):
+		a0[i,0] = random.random()
+	print np.amax(a0)
 
 	sim = Abbv(h0,methods.linear5_irregular,a0,b0)
 

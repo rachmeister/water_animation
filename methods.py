@@ -25,7 +25,7 @@ def linear5_irregular(sim):
 
 	A = 2./(np.square(sim.alpha[:,:-1])+np.multiply(sim.alpha[:,:-1],sim.alpha[:,1:]) )
 	B = 2./(np.square(sim.beta[1:,:])+np.multiply(sim.beta[1:,:],sim.beta[:-1,:]) )
-	C = -2./np.multiply(sim.alpha[:,:-1],sim.alpha[:,1:])-2./np.multiply(sim.beta[:-1,:],sim.beta[1:,:])
+	C = 2./np.multiply(sim.alpha[:,:-1],sim.alpha[:,1:])+2./np.multiply(sim.beta[:-1,:],sim.beta[1:,:])
 	D = 2./(np.square(sim.beta[:-1,:])+np.multiply(sim.beta[:-1,:],sim.beta[1:,:]) )
 	E = 2./(np.square(sim.alpha[:,1:])+np.multiply(sim.alpha[:,:1],sim.alpha[:,:-1]) )
 
