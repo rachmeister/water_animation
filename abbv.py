@@ -22,8 +22,10 @@ class Abbv(object):
 		self.h = array
 		self.dh = np.zeros((self.nx,self.ny),dtype=np.double)
 
+		self.bc = methods.passive_bc 	# Boundary Condition type -- callable BC function 
+
 		self.g = 0.8
-		self.b = 0.2 
+		self.b = 0.05 
 
 		self.dt = 0.01
 		self.dx = 0.5
@@ -33,6 +35,13 @@ class Abbv(object):
 		self.rain = False
 		self.dropstep = 50
 
+		self.obj = True
+		self.objx = 10.
+		self.objy = 10.
+		self.sgn = 1.
+		self.objstep = 25
+
+####Access Functions
 	def get_shape(self):
 		return (self.nx,self.ny)
 	def get_h(self):
@@ -40,9 +49,36 @@ class Abbv(object):
 	def set_rain(self,rain, drop=50):
 		self.rain = rain
 		self.dropstep = drop
-#	def set_bc(self):
+	def set_bc(self,type):
+		if type == 'passive':
+			self.bc = methods.passive_bc
+		elif type == 'reflective':
+			self.bc = methods.reflective_bc
+		elif type == 'periodic':
+			self.bc = methods.periodic_bc
 		
-	
+####Interactions
+	def move_object(self):
+
+		move = 1
+		direction = random.random()
+		dx = self.sgn*direction*move
+		dy = self.sgn*(1.-direction)*move
+		if( self.objx + dx > self.nx or self.objx + dx < 0 ):
+			dx = -dx
+			self.sgn = -self.sgn
+		if( self.objy + dy > self.ny or self.objy + dy < 0 ):
+			dy = -dy
+			self.sgn = -self.sgn
+		self.objx = self.objx + dx
+		self.objy = self.objy + dy		
+
+		idx = int(self.objx)
+		idy = int(self.objy)
+		self.h[idx,idy] = self.h[idx,idy] - 0.005*(1.-self.objx+idx)
+		self.h[idx,idy] = self.h[idx,idy] - 0.005*(1.-self.objy+idy)
+
+
 	def add_drop(self,height):
 		size = random.random()
 		if(height==0):
@@ -73,17 +109,24 @@ class Abbv(object):
 			h = np.roll(h,width,0)
 		self.h = h
 
+####Steps in time
 	def step5(self):
-		if(self.rain and self.it%self.dropstep==1):
+		if(self.rain and self.it%self.dropstep==0):
 			self.add_drop(0)
-#		self.dh = methods.linear5(self)
-		self.dh = methods.linear5_irregular(self)
+		if(self.obj and self.it%self.objstep==0):
+			self.move_object()
+		self.bc(self)
+		self.dh = methods.linear5(self)
+#		self.dh = methods.linear5_irregular(self)
 		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
 		self.it = self.it+1
 
 	def step9(self):
-		if(self.rain and self.it%self.dropstep==1):
+		if(self.rain and self.it%self.dropstep==0):
 			self.add_drop(0)
+		if(self.obj and self.it%self.objstep==0):
+			self.move_object()
+		self.bc(self)
 		self.dh = methods.linear9(self)
 		self.h[self.nb:-self.nb,self.nb:-self.nb] = self.h[self.nb:-self.nb,self.nb:-self.nb] + self.dh
 		self.it = self.it+1

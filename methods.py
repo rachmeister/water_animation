@@ -7,7 +7,7 @@ def linear5(sim):
 	dx = sim.dx
 	nb = sim.nb
 
-	reflective_bc(sim)
+#	reflective_bc(sim)
 	dh = (1.-k*dt)*(sim.dh)+(c2*(dt/dx)**2)*(-4*sim.h[  nb:  -nb,  nb:  -nb] + \
 															  sim.h[    :-2*nb,  nb:  -nb] + \
 															  sim.h[2*nb:     ,  nb:  -nb] + \
@@ -43,7 +43,7 @@ def linear9(sim):
 	dx = sim.dx
 	nb = sim.nb
 
-	reflective_bc(sim)
+#	reflective_bc(sim)
 
 ## Standard stencil
 	dh = (1.-k*dt)*(sim.dh)+(c2*(dt/dx)**2)*(-8*sim.h[nb:-nb,nb:-nb] + \
@@ -71,5 +71,21 @@ def linear9(sim):
 def reflective_bc(sim):
 	sim.h[ :, 0] = sim.h[ :, 1]
 	sim.h[ :,-1] = sim.h[ :,-2]
-	sim.h[ 0, :] = sim.h[ 0, :]
+	sim.h[ 0, :] = sim.h[ 1, :]
 	sim.h[-1, :] = sim.h[-2, :]
+
+def passive_bc(sim):
+#	sim.h[ :, 0] = sim.h[:, 2] - 2.*sim.h[ :, 1]
+#	sim.h[ :,-1] = sim.h[:,-3] - 2.*sim.h[ :,-2]
+#	sim.h[ 0, :] = sim.h[2, :] - 2.*sim.h[ 1, :]
+#	sim.h[-1, :] = sim.h[-3,:] - 2.*sim.h[-2, :]
+	sim.h[ :, 0] = 0
+	sim.h[ :,-1] = 0
+	sim.h[ 0, :] = 0
+	sim.h[-1, :] = 0
+
+def periodic_bc(sim):
+	sim.h[ :, 0] = sim.h[ :,-2]
+	sim.h[ :,-1] = sim.h[ :, 1]
+	sim.h[ 0, :] = sim.h[-2, :]
+	sim.h[-1, :] = sim.h[1,  :]
